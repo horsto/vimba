@@ -1,6 +1,6 @@
-﻿using OpenCV.Net;
+using OpenCV.Net;
 
-namespace Bonsai.Vimba
+namespace Bonsai.VimbaX
 {
     public class VimbaDataFrame
     {
