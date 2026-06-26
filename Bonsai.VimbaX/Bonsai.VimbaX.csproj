@@ -22,7 +22,7 @@
          net472 still consumes the netstandard2.0 VmbNET library fine. -->
     <TargetFramework>net472</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
 
     <!-- VmbNET ships as runtime-specific packages (the managed VmbNET.dll is
          identical across them; only the bundled native libs differ). Default to
@@ -38,19 +38,20 @@
   </ItemGroup>
 
   <!-- Pack the native Vimba X core (VmbC.dll) and its *_AVT.dll dependencies
-       into lib/$(TargetFramework) so they deploy next to Bonsai.VimbaX.dll in
-       Bonsai's Packages folder. The VmbNET.win-x64 package ships these as
-       contentFiles that the build copies into our output directory; we harvest
-       them from there and add them to the package. Combined with the
-       SetDllDirectory call in VmbNativeLoader, this lets the package load the
-       camera without the Vimba X SDK being on PATH. -->
+       into runtimes/win-x64/native so Bonsai's PackageConfigurationUpdater
+       picks them up as a native LibraryFolder and adds them to the native
+       search path (PATH prepend) automatically. They must NOT go in lib/ —
+       Bonsai reflection-loads every assembly in lib/ to discover workflow
+       types, and a native DLL there throws "expected to contain an assembly
+       manifest". The VmbNET.win-x64 package ships these natives as contentFiles
+       that the build copies into our output directory; we harvest them there. -->
   <Target Name="IncludeVmbNativeLibraries" BeforeTargets="_GetPackageFiles" DependsOnTargets="Build">
     <ItemGroup>
       <_VmbNativeLib Include="$(OutputPath)VmbC.dll" />
       <_VmbNativeLib Include="$(OutputPath)VmbC.xml" />
       <_VmbNativeLib Include="$(OutputPath)VmbImageTransform.dll" />
       <_VmbNativeLib Include="$(OutputPath)*_AVT.dll" />
-      <None Include="@(_VmbNativeLib)" Pack="true" PackagePath="lib\$(TargetFramework)" Visible="false" />
+      <None Include="@(_VmbNativeLib)" Pack="true" PackagePath="runtimes\win-x64\native" Visible="false" />
     </ItemGroup>
   </Target>
 
