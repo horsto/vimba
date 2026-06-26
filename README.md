@@ -215,7 +215,7 @@ Other formats throw — extend `GetConverter` in `VimbaCapture.cs` to add more.
 | Black preview | Exposure too short. Load a Viewer settings XML via `SettingsFile`. |
 | `... all the modules ... cannot be identified ... (NotFound)` | Settings loaded unscoped. Already handled in code by scoping to the Camera module — make sure you are on the current build. |
 | Dropdown can't find camera but Viewer can | Close the Vimba X Viewer (it holds the camera). |
-| `Failed to open Transport Layer! LoadLibraryW() ... LastError=126 ... Vimba_5.1\...TL.cti` | A stale **Vimba 5.1** GenTL transport layer is registered in `GENICAM_GENTL64_PATH` but cannot load (its runtime is missing). Vimba X trips over the dead entry. Fix by either (a) **fully (re)installing Vimba 5.1** so its transport-layer DLL resolves, or (b) **removing the old Vimba 5.1 install / its `Vimba_5.1\...` segment** from `GENICAM_GENTL64_PATH`, keeping only the Vimba X `...\Vimba X\...\cti` entry — then reboot. See [Stale Vimba 5.1 transport layer](#stale-vimba-51-transport-layer-new-machines). |
+| `Failed to open Transport Layer! LoadLibraryW() ... LastError=126 ... Vimba_5.1\...TL.cti` | A stale **Vimba 5.1** GenTL transport layer is registered in `GENICAM_GENTL64_PATH` but cannot load (its runtime is missing/broken). Vimba X trips over the dead entry. Fix: **uninstall the old Vimba 5.1** (Settings → Apps) so it no longer competes with Vimba X, then reboot. See [Stale Vimba 5.1 transport layer](#stale-vimba-51-transport-layer-new-machines). |
 | `Found 0 cameras` in smoke test | SDK installed but camera not seen — check cable, close Viewer. |
 | Package change not taking effect | Bump the package version and reinstall; Bonsai/NuGet cache packages by version. |
 
@@ -233,24 +233,29 @@ to enumerate with repeated errors like:
 
 `LastError=126` is `ERROR_MOD_NOT_FOUND`. The old Vimba 5.1 GenTL transport-layer
 path is still registered in the `GENICAM_GENTL64_PATH` environment variable, but the
-`.cti` cannot load because its runtime is incomplete — and Vimba X trips over the
-dead entry while scanning transport layers.
+`.cti` cannot load because its runtime is incomplete/broken — and Vimba X trips over
+the dead entry while scanning transport layers. The two SDKs' transport layers
+compete, and the broken 5.1 one blocks enumeration.
 
-Two ways to resolve it:
+**Fix: uninstall the legacy Vimba 5.1 SDK** so it no longer competes with Vimba X:
 
-- **(a) Fully (re)install Vimba 5.1** so its transport-layer DLL resolves cleanly.
-  This is the quickest fix if the 5.1 entry must stay registered. *(Confirmed
-  working in the field.)*
-- **(b) Remove the stale path:** uninstall the old Vimba 5.1 (Settings → Apps), or
-  edit `GENICAM_GENTL64_PATH` (Win → "Edit the system environment variables" →
-  Environment Variables) and delete the `...\Vimba_5.1\...` segment, keeping only
-  the Vimba X `...\Allied Vision\Vimba X\...\cti` entry. **Reboot** afterwards so
-  Bonsai picks up the change.
+- Settings → Apps → find **Vimba 5.1** → **Uninstall**. This removes its GenTL entry
+  from `GENICAM_GENTL64_PATH`.
+- **Reboot** so Bonsai picks up the cleaned environment.
+
+*(Confirmed working in the field — uninstalling 5.1 resolved enumeration on a fresh
+machine.)*
+
+If you must keep Vimba 5.1 for other software, instead edit `GENICAM_GENTL64_PATH`
+(Win → "Edit the system environment variables" → Environment Variables) and remove
+only the `...\Vimba_5.1\...` segment, keeping the Vimba X `...\Allied Vision\Vimba
+X\...\cti` entry, then reboot.
 
 Verify the resulting transport-layer path in PowerShell:
 
 ```powershell
 $env:GENICAM_GENTL64_PATH -split ';'
+# should list only the Vimba X cti folder
 ```
 
 ---
