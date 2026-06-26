@@ -135,7 +135,22 @@ namespace Bonsai.VimbaX
                         using var openCamera = camera.Open(ICameraInfo.AccessModeValue.Full);
                         if (!string.IsNullOrEmpty(settingsFile))
                         {
-                            openCamera.LoadSettings(settingsFile);
+                            // Restrict the restore to the Camera (RemoteDevice) module only.
+                            // Vimba X Viewer saves an "all modules" XML (PersistType=2/NoLUT)
+                            // that also contains LocalDevice / Stream / TransportLayer feature
+                            // groups tagged with hardware-specific IDs. The bare LoadSettings()
+                            // overload defaults to Modules=All and tries to match every module
+                            // to this open handle, failing with VmbErrorNotFound:
+                            // "all the modules whose settings should be saved cannot be
+                            // identified from this module". Scoping to Camera loads just the
+                            // acquisition-relevant features (ExposureTime, Gain, PixelFormat, ...).
+                            var persistSettings = new FeaturePersistSettings
+                            {
+                                Modules = FeaturePersistSettings.ModuleValues.Camera,
+                                Type = FeaturePersistSettings.TypeValue.NoLUT,
+                                MaximumIterations = 10
+                            };
+                            openCamera.LoadSettings(settingsFile, persistSettings);
                         }
 
                         void OnFrameReceived(object sender, FrameReceivedEventArgs e)

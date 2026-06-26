@@ -22,7 +22,7 @@
          net472 still consumes the netstandard2.0 VmbNET library fine. -->
     <TargetFramework>net472</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
 
     <!-- VmbNET ships as runtime-specific packages (the managed VmbNET.dll is
          identical across them; only the bundled native libs differ). Default to
