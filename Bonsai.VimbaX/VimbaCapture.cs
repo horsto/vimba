@@ -90,6 +90,11 @@ namespace Bonsai.VimbaX
                 {
                     try
                     {
+                        // Make the bundled native VmbC.dll discoverable before any
+                        // VmbNET P/Invoke, so the package works without the Vimba X
+                        // SDK being on PATH.
+                        VmbNativeLoader.EnsureNativeSearchPath();
+
                         // IVmbSystem is a reference-counted singleton; dispose on the way out
                         // to shut down Vimba X once all references are released.
                         using var vmbSystem = IVmbSystem.Startup();

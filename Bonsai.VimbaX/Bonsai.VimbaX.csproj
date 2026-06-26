@@ -22,7 +22,7 @@
          net472 still consumes the netstandard2.0 VmbNET library fine. -->
     <TargetFramework>net472</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
 
     <!-- VmbNET ships as runtime-specific packages (the managed VmbNET.dll is
          identical across them; only the bundled native libs differ). Default to
@@ -36,5 +36,22 @@
     <PackageReference Include="OpenCV.Net" Version="3.4.2" />
     <PackageReference Include="VmbNET.$(VmbNetRid)" Version="1.3.2" />
   </ItemGroup>
+
+  <!-- Pack the native Vimba X core (VmbC.dll) and its *_AVT.dll dependencies
+       into lib/$(TargetFramework) so they deploy next to Bonsai.VimbaX.dll in
+       Bonsai's Packages folder. The VmbNET.win-x64 package ships these as
+       contentFiles that the build copies into our output directory; we harvest
+       them from there and add them to the package. Combined with the
+       SetDllDirectory call in VmbNativeLoader, this lets the package load the
+       camera without the Vimba X SDK being on PATH. -->
+  <Target Name="IncludeVmbNativeLibraries" BeforeTargets="_GetPackageFiles" DependsOnTargets="Build">
+    <ItemGroup>
+      <_VmbNativeLib Include="$(OutputPath)VmbC.dll" />
+      <_VmbNativeLib Include="$(OutputPath)VmbC.xml" />
+      <_VmbNativeLib Include="$(OutputPath)VmbImageTransform.dll" />
+      <_VmbNativeLib Include="$(OutputPath)*_AVT.dll" />
+      <None Include="@(_VmbNativeLib)" Pack="true" PackagePath="lib\$(TargetFramework)" Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

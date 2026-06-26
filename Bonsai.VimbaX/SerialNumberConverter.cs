@@ -13,6 +13,9 @@ namespace Bonsai.VimbaX
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
+            // Ensure the bundled native VmbC.dll is discoverable so the dropdown
+            // works without the Vimba X SDK being on PATH.
+            VmbNativeLoader.EnsureNativeSearchPath();
             using var vmbSystem = IVmbSystem.Startup();
             var cameraList = vmbSystem.GetCameras();
             var values = new List<string>(cameraList.Count);
