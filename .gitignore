@@ -1,5 +1,17 @@
-.vs
-bin
-obj
-*.dll
-*.xml
+## .NET / build output
+bin/
+obj/
+*.user
+.vs/
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## NuGet
+*.nupkg
+*.snupkg
+
+## ...but DO ship the prebuilt release package in dist/
+!dist/
+!dist/*.nupkg

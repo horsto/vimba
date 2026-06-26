@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Pick the VmbNET runtime package matching the build host.
+         Override with -p:VmbNetRid=win-x64 / linux-x64 / linux-arm64 -->
+    <VmbNetRid Condition="'$(VmbNetRid)'=='' and $([MSBuild]::IsOSPlatform('Windows'))">win-x64</VmbNetRid>
+    <VmbNetRid Condition="'$(VmbNetRid)'=='' and $([MSBuild]::IsOSPlatform('Linux'))">linux-x64</VmbNetRid>
+    <VmbNetRid Condition="'$(VmbNetRid)'==''">win-x64</VmbNetRid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="VmbNET.$(VmbNetRid)" Version="1.3.2" />
+  </ItemGroup>
+
+</Project>
