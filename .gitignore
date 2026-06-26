@@ -11,3 +11,7 @@ obj/
 ## NuGet
 *.nupkg
 *.snupkg
+
+## ...but DO ship the prebuilt release package in dist/
+!dist/
+!dist/*.nupkg
