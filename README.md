@@ -16,6 +16,11 @@ Bonsai from a normal launch — no special shell, no SDK on `PATH`.
 
 ---
 
+![Bonsai.VimbaX screenshot](screenshot.png)
+
+
+
+
 ## Quick start (use the prebuilt package — no building)
 
 If you just want to use the camera in Bonsai and not build anything:
